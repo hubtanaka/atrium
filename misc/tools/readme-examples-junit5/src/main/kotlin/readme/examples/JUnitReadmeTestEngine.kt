@@ -61,18 +61,17 @@ class JUnitReadmeTestEngine: TestEngine {
         try {
             Locale.setDefault(Locale.UK)
 
-            runJUnitWithCustomListener(request)
+            runJUnitWithCustomListener(request) //NOTE: build examples and code
 
-            processExamples(request)
+            val classes: List<String> = javaClasses.map { it.name.replace(".", "/") }
+            processExamples(classes, request)
         } catch (t: Throwable) {
             t.printStackTrace()
             Locale.setDefault(default)
         }
     }
 
-    private fun processExamples(request: ExecutionRequest) {
-        val classes: List<String> = javaClasses.map { it.name.replace(".", "/") }
-
+    private fun processExamples(classes: List<String>, request: ExecutionRequest){
         val specContents = classes.map { qualifiedClass ->
             qualifiedClass to fileContent("src/main/kotlin/$qualifiedClass.kt", request)
         }
@@ -249,7 +248,7 @@ class JUnitReadmeTestEngine: TestEngine {
                     if (line.startsWith("    }")) return Triple(qualifiedClass, lineNumber!!, sb.toString().trimIndent())
                     sb.append(line).append("\n")
 
-                } else if (line.trim().startsWith("test(\"$testId\")")) {
+                } else if (line.trim().startsWith("fun `$testId`")) {
                     lineNumber = index + 1
                 }
             }
@@ -314,14 +313,12 @@ class JUnitReadmeTestEngine: TestEngine {
                 return listener.executionFinished(testDescriptor, TestExecutionResult.successful())
             }
 
-            throw IllegalArgumentException("testDescriptor is not a test nor container: ${testDescriptor.displayName}") // TODO
+            throw IllegalArgumentException("testDescriptor is not a test nor container: ${testDescriptor.displayName}")
         }
 
         private fun invokeTestMethod(listener: EngineExecutionListener, testDescriptor: TestDescriptor) {
             val method = testDescriptor.source.get() as MethodSource
             val instance = method.javaClass.getDeclaredConstructor().newInstance()
-//            println("instance.javaClass.name = " + instance.javaClass.name)
-//            println("method.methodName = " + method.methodName)
 
             listener.executionStarted(testDescriptor)
             try {
@@ -332,11 +329,8 @@ class JUnitReadmeTestEngine: TestEngine {
             }
         }
 
-        /**
-         * @see readme.examples.ReadmeExecutionListener.handleSuccess
-         */
         private fun handleSuccess(testDescriptor: TestDescriptor) {
-            val testName: String = testDescriptor.displayName
+            val testName: String = testDescriptor.simpleName
 
             if (!testName.startsWith("code")) {
                 listener.executionFinished(
@@ -356,12 +350,9 @@ class JUnitReadmeTestEngine: TestEngine {
             code.add(testName)
             listener.executionFinished(testDescriptor, TestExecutionResult.successful())
         }
-
-        /**
-         * @see readme.examples.ReadmeExecutionListener.handleFailure
-         */
+        
         private fun handleFailure(testDescriptor: TestDescriptor, thrown: Throwable) {
-            val testName: String = testDescriptor.displayName
+            val testName: String = testDescriptor.simpleName
 
             if (!testName.startsWith("ex")) {
                 listener.executionFinished(
@@ -369,20 +360,25 @@ class JUnitReadmeTestEngine: TestEngine {
                     TestExecutionResult.failed(
                         IllegalStateException(
                             "only example tests are supposed to fail, not $testName",
-                            thrown // TODO verify
+                            thrown.cause
                         )
                     )
                 )
                 return
             }
-            when (thrown.cause) { // TODO verify
+            when (thrown.cause) {
                 is AssertionError -> {
-                    //println(thrown.javaClass.simpleName + ": " + thrown.message)
-                    examples[testName] = thrown.cause!!.message!! // TODO verify
+                    val resultCauseMessage = thrown.cause!!.message!!
+                    examples[testName] = resultCauseMessage
                     listener.executionFinished(testDescriptor, TestExecutionResult.successful())
                 }
                 else -> listener.executionFinished(testDescriptor, TestExecutionResult.failed(thrown))
             }
         }
+
+        private val TestDescriptor.simpleName: String
+            get() {
+                return displayName.replace("()", "")
+            }
     }
 }
