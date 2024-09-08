@@ -40,7 +40,7 @@ kotlin {
                 "--scan-class-path", project.sourceSets.main.get().output.classesDirs.asPath,
                 "--disable-banner",
                 "--fail-if-no-tests",
-                "--include-engine", "spek2-readme",
+                "--include-engine", "atrium-readme",
                 "--details", "summary"
             )
         }
