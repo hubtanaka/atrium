@@ -40,7 +40,7 @@ kotlin {
                 "--scan-class-path", project.sourceSets.main.get().output.classesDirs.asPath,
                 "--disable-banner",
                 "--fail-if-no-tests",
-                "--include-engine", "junit5-readme",
+                "--include-engine", "spek2-readme",
                 "--details", "summary"
             )
         }
