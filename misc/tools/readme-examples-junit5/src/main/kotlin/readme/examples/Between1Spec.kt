@@ -4,7 +4,7 @@ import ch.tutteli.atrium.api.fluent.en_GB.and
 import ch.tutteli.atrium.api.fluent.en_GB.toBeGreaterThanOrEqualTo
 import ch.tutteli.atrium.api.fluent.en_GB.toBeLessThan
 import ch.tutteli.atrium.creating.Expect
-import org.spekframework.spek2.Spek
+import org.junit.jupiter.api.Test
 import java.util.*
 
 /**
@@ -21,12 +21,13 @@ import java.util.*
  *
  * Moreover, all tags can reuse snippets defined in this file with corresponding markers
  */
-object Between1Spec : Spek({
-    test("code-own-compose-1") {
+class Between1Spec {
+    @Test
+    fun `code-own-compose-1`() {
         fun <T : Date> Expect<T>.toBeBetween(lowerBoundInclusive: T, upperBoundExclusive: T) =
             and {
                 toBeGreaterThanOrEqualTo(lowerBoundInclusive)
                 toBeLessThan(upperBoundExclusive)
             }
     }
-})
+}

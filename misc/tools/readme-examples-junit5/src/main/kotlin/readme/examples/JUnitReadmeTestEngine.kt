@@ -12,11 +12,14 @@ import org.junit.platform.engine.*
 import org.junit.platform.engine.support.descriptor.EngineDescriptor
 import org.junit.platform.engine.support.descriptor.MethodSource
 import java.lang.reflect.Method
+import java.lang.reflect.Modifier
 import java.nio.file.Paths
 import java.util.Locale
 
 class JUnitReadmeTestEngine: TestEngine {
     private val javaClasses = listOf( // TODO scan at discovery
+        Between1Spec::class.java,
+        DataDrivenSpec::class.java,
         FirstExampleSpec::class.java,
         MostExamplesSpec::class.java,
     )
@@ -39,8 +42,9 @@ class JUnitReadmeTestEngine: TestEngine {
             )
             engineDescriptor.addChild(classTestDescriptor)
 
-            val methods = javaClass.methods.filter {
-                it.isAnnotationPresent(Test::class.java) // @Test
+            val methods = javaClass.methods.filter { method: Method ->
+                method.isAnnotationPresent(Test::class.java) // @Test
+                    && Modifier.isPublic(method.modifiers) // public
             }
             methods.forEach { method: Method ->
                 val testMethodDescriptor = TestMethodTestDescriptor(
@@ -317,10 +321,17 @@ class JUnitReadmeTestEngine: TestEngine {
         }
 
         private fun invokeTestMethod(listener: EngineExecutionListener, testDescriptor: TestDescriptor) {
-            val method = testDescriptor.source.get() as MethodSource
-            val instance = method.javaClass.getDeclaredConstructor().newInstance()
-
             listener.executionStarted(testDescriptor)
+
+            val method = testDescriptor.source.get() as MethodSource
+            val instance: Any
+            try {
+                instance = method.javaClass.getDeclaredConstructor().newInstance()
+            } catch (t: Throwable) {
+                t.printStackTrace()
+                return listener.executionFinished(testDescriptor, TestExecutionResult.failed(t))
+            }
+            
             try {
                 method.javaMethod.invoke(instance)
                 return handleSuccess(testDescriptor)
@@ -350,7 +361,7 @@ class JUnitReadmeTestEngine: TestEngine {
             code.add(testName)
             listener.executionFinished(testDescriptor, TestExecutionResult.successful())
         }
-        
+
         private fun handleFailure(testDescriptor: TestDescriptor, thrown: Throwable) {
             val testName: String = testDescriptor.simpleName
 
