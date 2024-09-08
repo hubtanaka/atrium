@@ -8,7 +8,7 @@ import ch.tutteli.atrium.api.verbs.expect
 //@formatter:on
 
 import ch.tutteli.atrium.creating.Expect
-import org.spekframework.spek2.Spek
+import org.junit.jupiter.api.Test
 
 /**
  * The tests and error message are written here and automatically placed into the README via generation.
@@ -24,14 +24,15 @@ import org.spekframework.spek2.Spek
  *
  * Moreover, all tags can reuse snippets defined in this file with corresponding markers
  */
-class FirstExampleSpec: Spek({
+class FirstExampleSpec {
 
     fun <T> expect(t: T): Expect<T> = readme.examples.utils.expect(t)
 
-    test("ex-first") {
+    @Test
+    fun `ex-first`() {
         //snippet-import-insert
 
         val x = 10
         expect(x).toEqual(9)
     }
-})
+}

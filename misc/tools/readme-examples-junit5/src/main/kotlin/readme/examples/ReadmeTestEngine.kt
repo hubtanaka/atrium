@@ -18,6 +18,7 @@ class ReadmeTestEngine: TestEngine {
 
         val classes = listOf( // TODO scan
             FirstExampleSpec::class.java,
+            MostExamplesSpec::class.java,
         )
 
         classes.forEach { aClass ->
@@ -31,7 +32,7 @@ class ReadmeTestEngine: TestEngine {
             val methods = aClass.methods
             methods.forEach { method: Method ->
                 val testMethodDescriptor = TestMethodTestDescriptor(
-                    uniqueId.append("method", method.name),
+                    classTestDescriptor.uniqueId.append("method", method.name),
                     aClass,
                     method,
                     configuration
@@ -76,38 +77,5 @@ class ReadmeTestEngine: TestEngine {
                 dump(it)
             }
         }
-    }
-
-    private fun getClasses(packageName: String): List<Class<*>> {
-        val resourceName: String = packageName.replace(".", "/")
-        val classLoader = Thread.currentThread().contextClassLoader
-        val root: URL = classLoader.getResource(resourceName)
-            ?: throw IllegalArgumentException("failed to load package: $packageName")
-
-        return when(root.protocol) {
-            "file" -> {
-                val rootFile: File = File(root.file)
-                val files: List<File> = rootFile.listFiles()?.toList()
-                    ?: throw IllegalStateException("package does not have any files: $packageName")
-                return files.mapNotNull { file: File ->
-                    getClass(packageName, file)
-                }
-            }
-            "jar" -> throw NotImplementedError("jar")
-            else -> throw NotImplementedError("else")
-        }
-    }
-
-    private fun getClass(packageName: String, file: File): Class<*>? {
-        val fileName = file.name.replace(".class$", "")
-        val fullName = "$packageName.$fileName"
-
-        try {
-            return Class.forName(fullName)
-        } catch (t: Throwable) {
-            t.printStackTrace()
-        }
-
-        return null
     }
 }
