@@ -9,6 +9,7 @@ import ch.tutteli.atrium.api.verbs.expect
 
 import ch.tutteli.atrium.creating.Expect
 import org.junit.jupiter.api.Test
+import org.junit.jupiter.api.extension.ExtendWith
 
 /**
  * The tests and error message are written here and automatically placed into the README via generation.
@@ -24,6 +25,7 @@ import org.junit.jupiter.api.Test
  *
  * Moreover, all tags can reuse snippets defined in this file with corresponding markers
  */
+
 class FirstExampleSpec {
 
     fun <T> expect(t: T): Expect<T> = readme.examples.utils.expect(t)
