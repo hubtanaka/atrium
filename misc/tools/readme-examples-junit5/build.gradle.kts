@@ -9,9 +9,9 @@ kotlin {
         main {
             dependencies {
                 implementation(libs.junit.platform.console)
-                implementation(libs.spek.jvm)
-                implementation(libs.spek.runner)
-                implementation(libs.spek.runtime)
+//                implementation(libs.spek.jvm)
+//                implementation(libs.spek.runner)
+//                implementation(libs.spek.runtime)
                 runtimeOnly(kotlin("reflect"))
 
                 implementation(prefixedProject("fluent"))
