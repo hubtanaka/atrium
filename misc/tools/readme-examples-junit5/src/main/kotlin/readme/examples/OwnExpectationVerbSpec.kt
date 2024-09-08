@@ -16,7 +16,7 @@ import ch.tutteli.atrium.creating.RootExpect
 import ch.tutteli.atrium.logic.creating.RootExpectBuilder
 import ch.tutteli.atrium.reporting.ObjectFormatter
 import ch.tutteli.atrium.reporting.text.TextAssertionPairFormatter
-import org.spekframework.spek2.Spek
+import org.junit.jupiter.api.Test
 import readme.examples.utils.ReadmeObjectFormatter
 import readme.examples.expect as expectWithNewLine
 
@@ -35,8 +35,9 @@ import readme.examples.expect as expectWithNewLine
  * Moreover, all tags can reuse snippets defined in this file with corresponding markers
  */
 
-object OwnExpectationVerbSpec : Spek({
-    test("code-own-expectation-verb") {
+class OwnExpectationVerbSpec {
+    @Test
+    fun `code-own-expectation-verb`() {
         //snippet-own-expectation-verb-import-insert
 
         //snippet-own-expectation-verb-insert
@@ -48,10 +49,11 @@ object OwnExpectationVerbSpec : Spek({
             withComponent(ObjectFormatter::class) { c -> ReadmeObjectFormatter(c.build()) }
         }
 
-    test("ex-own-expectation-verb") {
+    @Test
+    fun `ex-own-expectation-verb`() {
         expect(10).toEqual(9)
     }
-})
+}
 
 //snippet-own-expectation-verb-start
 @OptIn(ExperimentalNewExpectTypes::class, ExperimentalComponentFactoryContainer::class)

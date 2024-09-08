@@ -9,7 +9,7 @@ import ch.tutteli.atrium.logic._logic
 //@formatter:on
 import ch.tutteli.atrium.reporting.Text
 import org.assertj.core.api.Assertions.assertThat
-import org.spekframework.spek2.Spek
+import org.junit.jupiter.api.Test
 import readme.examples.utils.expect
 import java.math.BigDecimal
 import kotlin.math.sign
@@ -28,9 +28,10 @@ import kotlin.math.sign
  *
  * Moreover, all tags can reuse snippets defined in this file with corresponding markers
  */
-object ThirdPartySpec : Spek({
+class ThirdPartySpec {
 
-    test("ex-third-party-1") {
+    @Test
+    fun `ex-third-party-1`() {
         expect(listOf(1, 2, 3, -1)).toHaveElementsAndAll {
             toHoldThirdPartyExpectation("not to be", Text("negative")) { subject ->
                 // in the following we use assertJ
@@ -39,7 +40,8 @@ object ThirdPartySpec : Spek({
         }
     }
 
-    test("ex-third-party-2") {
+    @Test
+    fun `ex-third-party-2`() {
         fun <T : Number> Expect<T>.notToBeNegative() =
             toHoldThirdPartyExpectation("not to be", Text("negative")) { subject ->
                 when (subject) {
@@ -56,7 +58,8 @@ object ThirdPartySpec : Spek({
         expect(-10).notToBeNegative()
     }
 
-    test("ex-third-party-3") {
+    @Test
+    fun `ex-third-party-3`() {
         //snippet-import-insert
 
         fun <T : Number> Expect<T>.notToBeNegative() =
@@ -82,7 +85,8 @@ object ThirdPartySpec : Spek({
         throw IllegalStateException("threshold value for alpha1 exceeded, expected <= 1000, was $alpha1")
     }
 
-    test("ex-third-party-10") {
+    @Test
+    fun `ex-third-party-10`() {
         fun Expect<MyDomainModel>.toComplyValidation() =
             toHoldThirdPartyExpectation("to comply", Text("validation")) { subject ->
                 subject.validateMinThreshold()
@@ -92,6 +96,6 @@ object ThirdPartySpec : Spek({
 
         expect(MyDomainModel(alpha1 = 1204)).toComplyValidation()
     }
-})
+}
 
 

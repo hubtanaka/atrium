@@ -20,8 +20,14 @@ class JUnitReadmeTestEngine: TestEngine {
     private val javaClasses = listOf( // TODO scan at discovery
         Between1Spec::class.java,
         DataDrivenSpec::class.java,
+        FaqSpec::class.java,
+        FeatureExtractorSpec::class.java,
         FirstExampleSpec::class.java,
         MostExamplesSpec::class.java,
+        OwnExpectationFunctionsSpec::class.java,
+        OwnExpectationVerbSpec::class.java,
+        PathSpec::class.java,
+        ThirdPartySpec::class.java,
     )
 
     private val examples = mutableMapOf<String, String>()
@@ -331,7 +337,7 @@ class JUnitReadmeTestEngine: TestEngine {
                 t.printStackTrace()
                 return listener.executionFinished(testDescriptor, TestExecutionResult.failed(t))
             }
-            
+
             try {
                 method.javaMethod.invoke(instance)
                 return handleSuccess(testDescriptor)

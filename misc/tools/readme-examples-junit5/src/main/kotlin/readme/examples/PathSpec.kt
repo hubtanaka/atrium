@@ -4,7 +4,8 @@ import ch.tutteli.atrium.api.fluent.en_GB.toBeARegularFile
 import ch.tutteli.atrium.api.fluent.en_GB.toBeWritable
 import ch.tutteli.atrium.api.fluent.en_GB.toExist
 import ch.tutteli.niok.deleteRecursively
-import org.spekframework.spek2.Spek
+import org.junit.jupiter.api.AfterAll
+import org.junit.jupiter.api.Test
 import readme.examples.utils.expect
 import java.nio.file.Files
 import java.nio.file.Path
@@ -27,28 +28,37 @@ import java.util.*
  * Moreover, all tags can reuse snippets defined in this file with corresponding markers
  */
 
-object PathSpec : Spek({
-    val toDelete: MutableSet<Path> = HashSet()
+class PathSpec {
+    //    afterGroup {
+    //        toDelete.forEach { it.deleteRecursively() }
+    //    }
+    companion object {
+        val toDelete: MutableSet<Path> = HashSet()
+        val tmpdir = Paths.get(System.getProperty("java.io.tmpdir"))
 
-    afterGroup {
-        toDelete.forEach { it.deleteRecursively() }
+        @AfterAll @JvmStatic
+        fun deletePaths() { // TODO verify whether this method works or not
+            toDelete.add(tmpdir.resolve("atrium-path"))
+            toDelete.forEach { it.deleteRecursively() }
+        }
     }
 
-    test("ex-path-exists") {
+    @Test
+    fun `ex-path-exists`() {
         expect(Paths.get("/usr/bin/noprogram")).toExist()
     }
 
-    test("ex-path-writable") {
+    @Test
+    fun `ex-path-writable`() {
         expect(Paths.get("/root/.ssh/config")).toBeWritable()
     }
 
-    val tmpdir = Paths.get(System.getProperty("java.io.tmpdir"))
-    test("ex-path-symlink-and-parent-not-folder") {
+    @Test
+    fun `ex-path-symlink-and-parent-not-folder`() {
         val directory = Files.createDirectory(tmpdir.resolve("atrium-path"))
         val file = Files.createFile(directory.resolve("file"))
         val filePointer = Files.createSymbolicLink(directory.resolve("directory"), file)
 
         expect(filePointer.resolve("subfolder/file")).toBeARegularFile()
     }
-    toDelete.add(tmpdir.resolve("atrium-path"))
-})
+}

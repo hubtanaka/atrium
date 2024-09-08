@@ -9,9 +9,6 @@ kotlin {
         main {
             dependencies {
                 implementation(libs.junit.platform.console)
-                implementation(libs.spek.jvm) // TODO delete
-                implementation(libs.spek.runner) // TODO delete
-                implementation(libs.spek.runtime) // TODO delete
                 runtimeOnly(kotlin("reflect"))
 
                 implementation(prefixedProject("fluent"))
